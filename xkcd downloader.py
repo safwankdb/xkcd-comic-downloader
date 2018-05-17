@@ -1,7 +1,11 @@
 from selenium import webdriver
 from urllib.request import urlretrieve
 import os
-files=os.listdir('./xkcd')
+folders=os.listdir('./xkcd')
+files=[]
+for folder in folders:
+	for file in os.listdir('./xkcd/'+folder):
+		files.append(file)
 print('Reading existing files...')
 done=0
 for file in files:
@@ -16,7 +20,7 @@ print('Total images to be downloaded: '+str(noOfComics)+' - '+str(done)+' = '+st
 web.get(url+'/'+str(done+1))
 for i in range(noOfComics-done):
 	name=web.find_element_by_xpath('//*[@id="ctitle"]').text
-	print('Downloading '+name+'...')
+	print('Downloading '+name+'...',end='\r')
 	next=web.find_element_by_xpath('/html/body/div[2]/ul[1]/li[4]/a')
 	sources=web.find_elements_by_xpath('//div[@id="comic"]//img')
 	if len(sources)>0:
@@ -24,8 +28,13 @@ for i in range(noOfComics-done):
 	else:
 		next.click()
 		continue
+	index=int((i+done)/1000)*1000
+	if (i+1+done)%1000 == 1:
+		if str(1+index)+'-'+str(index+1000) not in folders:
+			os.makedirs('./xkcd/'+str(1+index)+'-'+str(index+1000))
 	name=(str(i+1+done)+'_'+name).replace('/','\\')
-	urlretrieve(source, os.path.join('./xkcd',name))
+	urlretrieve(source, os.path.join('./xkcd/'+str(1+index)+'-'+str(index+1000)+'/',name))
+	print('Downloaded '+name)
 	next.click()
 print("All comics downloaded. Enjoy!")
 web.close()
