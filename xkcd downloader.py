@@ -1,7 +1,12 @@
 from selenium import webdriver
 from urllib.request import urlretrieve
 import os
+import imghdr
 folders=os.listdir('./xkcd')
+if '.git'in folders:
+	folders.remove('.git')
+if 'README.md'in folders:
+	folders.remove('README.md')
 files=[]
 for folder in folders:
 	for file in os.listdir('./xkcd/'+folder):
@@ -33,7 +38,9 @@ for i in range(noOfComics-done):
 		if str(1+index)+'-'+str(index+1000) not in folders:
 			os.makedirs('./xkcd/'+str(1+index)+'-'+str(index+1000))
 	name=(str(i+1+done)+'_'+name).replace('/','\\')
-	urlretrieve(source, os.path.join('./xkcd/'+str(1+index)+'-'+str(index+1000)+'/',name))
+	path=os.path.join('./xkcd/'+str(1+index)+'-'+str(index+1000)+'/',name)
+	urlretrieve(source, path)
+	os.rename(path,path+'.'+imghdr.what(path))
 	print('Downloaded '+name)
 	next.click()
 print("All comics downloaded. Enjoy!")
